@@ -1,1 +1,1 @@
-Foodie ReactNative App
+Foodie Vue App
