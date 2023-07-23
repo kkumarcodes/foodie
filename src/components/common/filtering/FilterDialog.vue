@@ -55,31 +55,6 @@
               </q-item>
             </q-card>
 
-            <div class="text-weight-semibold q-mt-md" v-if="showFilter('type')">
-              By Type
-            </div>
-
-            <q-btn-group
-              class="component-shadow full-width q-mt-md bg-white"
-              v-if="showFilter('type')"
-            >
-              <q-btn
-                v-for="tab in tabs"
-                :key="tab"
-                no-caps
-                :ripple="false"
-                :label="tab"
-                class="full-width text-body2"
-                :class="[
-                  activeType == tab.toLowerCase()
-                    ? 'bg-primary-50 border-primary-500 border text-weight-semibold'
-                    : ''
-                ]"
-                padding="12px"
-                @click="() => onTabClicked(tab.toLowerCase())"
-              ></q-btn>
-            </q-btn-group>
-
             <div
               class="text-weight-semibold q-mt-md"
               v-if="showFilter('category')"
@@ -172,7 +147,7 @@
   const categories = ref(
     categoriesList.map(category => ({
       ...category,
-      checked: props.byCategory.includes(category.name)
+      checked: props.byCategory.includes(category.value)
     }))
   );
   const sortBy = ref(props.sortBy);
@@ -190,7 +165,7 @@
   function onUpdateBtnClicked() {
     const selectedCategories = categories.value
       .filter(category => category.checked)
-      .map(c => c.name);
+      .map(c => c.value);
 
     onDialogOK({
       categories: selectedCategories,
@@ -202,7 +177,7 @@
   function resetFilters() {
     categories.value = categoriesList.map(category => ({
       ...category,
-      checked: false
+      checked: true
     }));
     sortBy.value = 'newToOld';
     activeType.value = 'all';
@@ -215,7 +190,7 @@
   onMounted(() => {
     categories.value = categoriesList.map(category => ({
       ...category,
-      checked: props.byCategory.includes(category.name)
+      checked: props.byCategory.includes(category.value)
     }));
 
     sortBy.value = props.sortBy;
