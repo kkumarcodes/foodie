@@ -1,0 +1,128 @@
+.register1 {
+  position: relative;
+  background-color: #fafafd;
+  padding: 24px;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+  cursor: pointer;
+  font-size: 14px;
+  color: #afb0b6;
+  font-family: Poppins;
+
+
+  .log-in1 {
+    color: #356899;
+  }
+
+  .have-an-account-container {
+
+    margin-top: 32px;
+    width: 100%;
+    text-align: center;
+    font-family: "Circular Std";
+    color: #bdbec2;
+  }
+
+  .headline11 {
+
+    margin-top: 0px;
+    left: 0px;
+    letter-spacing: -0.01em;
+    line-height: 140%;
+    font-weight: 600;
+  }
+
+  .headline12 {
+
+    margin-top: 8px;
+    left: 0px;
+    font-size: 14px;
+    letter-spacing: -0.01em;
+    line-height: 160%;
+    opacity: 0.4;
+  }
+
+  .headline-parent1 {
+
+    margin-top: 8px;
+    left: 24px;
+    width: 188px;
+    height: 63px;
+    text-align: left;
+    font-size: 24px;
+    color: #0d0d26;
+  }
+
+  .button7 {
+
+    margin-top: 32px;
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    padding: 16px 48px;
+    box-sizing: border-box;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    color: #fff;
+  }
+
+  .password6-1-icon3 {
+    position: absolute;
+    top: 16px;
+    left: 24px;
+    width: 20px;
+    height: 20px;
+    overflow: hidden;
+  }
+
+  .profile2-1-icon {
+    position: absolute;
+    height: 2.46%;
+    width: 5.33%;
+    top: 31.53%;
+    right: 82.13%;
+    bottom: 66.01%;
+    left: 12.53%;
+    max-width: 100%;
+    overflow: hidden;
+    max-height: 100%;
+  }
+
+  .confirm-password {
+    position: absolute;
+    top: 15px;
+    left: 55px;
+    letter-spacing: -0.01em;
+    line-height: 150%;
+    font-weight: 500;
+  }
+
+  .mail-outline-1-icon1 {
+    position: absolute;
+    top: 16px;
+    left: 24px;
+    width: 19px;
+    height: 20px;
+    overflow: hidden;
+  }
+
+  .full-name {
+    position: absolute;
+    top: 16px;
+    left: 55px;
+    letter-spacing: -0.01em;
+    line-height: 150%;
+    font-weight: 500;
+  }
+
+  .register-child {
+
+    margin-top: 648px;
+    left: 59px;
+    width: 256px;
+    height: 96px;
+  }
+
+}

@@ -59,7 +59,7 @@ async function onNetworkStatusChange(status) {
       router.replace(commonStore.offlineRoute);
     } else {
       router.replace({
-        name: 'dashboard'
+        name: 'search'
       });
     }
     commonStore.$patch(state => {

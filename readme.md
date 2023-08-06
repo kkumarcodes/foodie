@@ -1,1 +1,1 @@
-Foodie Vue App
+# Foodie Vue Project

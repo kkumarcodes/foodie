@@ -1,0 +1,385 @@
+workflows:
+  build-android-apk-dev:
+    name: build android apk for dev environment
+    max_build_duration: 120
+    instance_type: mac_pro
+    environment:
+      groups:
+        - android-trufaves-app
+      vars:
+        KEYSTORE_PATH: /tmp/.keystore
+        APP_ENV: dev
+      node: 16.14.2
+    scripts:
+      - &setup_sops_and_svc_acct_pre_prod
+        name: setup sops and service account
+        script: |
+          brew install sops
+          echo $SERVICE_ACCOUNT_PRE_PROD > /tmp/svc-acct.json
+      - &setup_env_var_pre_prod
+        name: Setup environment variables
+        script: |
+          export GOOGLE_APPLICATION_CREDENTIALS=/tmp/svc-acct.json
+          sops -d $FCI_BUILD_DIR/docker/env.dev > $FCI_BUILD_DIR/.env
+      - &install_node_modules
+        name: Install dependencies and quasar cli
+        script: |
+          yarn
+          yarn global add @quasar/cli
+      - name: Build and Copy web assets to native project
+        script: |
+          quasar build -m capacitor -T android --skip-pkg
+          cd src-capacitor && npx cap sync android
+      - name: Set Android SDK location
+        script: |
+          echo "sdk.dir=$ANDROID_SDK_ROOT" > "$FCI_BUILD_DIR/src-capacitor/android/local.properties"
+      - name: Set up debug key.properties
+        script: |
+          rm -rf ~/.android/debug.keystore
+          keytool -genkeypair \
+            -alias androiddebugkey \
+            -keypass android \
+            -keystore ~/.android/debug.keystore \
+            -storepass android \
+            -dname 'CN=Android Debug,O=Android,C=US' \
+            -keyalg 'RSA' \
+            -keysize 2048 \
+            -validity 10000
+      - name: Setup keystore
+        script: |
+          echo $KEYSTORE | base64 --decode > $KEYSTORE_PATH
+          cat > $FCI_BUILD_DIR/src-capacitor/android/key.properties <<EOF
+          storePassword=$KEYSTORE_PASSWORD
+          keyPassword=$KEY_PASSWORD
+          keyAlias=$KEY_ALIAS
+          storeFile=$KEYSTORE_PATH
+          EOF
+      - name: Build Android apk
+        script: |
+          cd $FCI_BUILD_DIR/src-capacitor/android
+          cp ../build.gradle app/build.gradle
+          chmod +x gradlew && ./gradlew assembleRelease
+    artifacts:
+      - $FCI_BUILD_DIR/src-capacitor/android/app/build/**/outputs/**/*.apk
+    publishing:
+      email:
+        recipients:
+          - sajid.qureshi@cilalabs.com
+        notify:
+          success: true
+          failure: true
+      slack:
+        channel: '#p-trufaves'
+        notify:
+          success: true
+          failure: true
+
+  build-ios-ipa-dev:
+    name: build ios ipa for dev environment for testflight
+    max_build_duration: 120
+    instance_type: mac_pro
+    environment:
+      groups:
+        - ios-trufaves-app
+        - android-trufaves-app
+      vars:
+        # Ionic Xcode worskspace and scheme
+        XCODE_WORKSPACE: 'src-capacitor/ios/App/App.xcworkspace'
+        XCODE_SCHEME: 'App'
+        APP_ENV: dev
+      node: 16.14.2
+      xcode: latest
+      cocoapods: default
+    scripts:
+      - *setup_sops_and_svc_acct_pre_prod
+      - *setup_env_var_pre_prod
+      - *install_node_modules
+      - name: Build and Copy web assets to ios project
+        script: |
+          quasar build -m capacitor -T ios --skip-pkg
+          cd src-capacitor && npx cap sync ios
+      - name: Cocoapods installation
+        script: |
+          cd $FCI_BUILD_DIR/src-capacitor/ios/App && pod install
+      - name: Set up keychain to be used for codesigning
+        script: |
+          keychain initialize
+      - name: Fetch signing files
+        script: |
+          app-store-connect fetch-signing-files com.trufaves.mobile --type IOS_APP_STORE --create
+      - name: Add certificates to keychain
+        script: |
+          keychain add-certificates
+      - name: Increment build number
+        script: |
+          #!/bin/sh
+          set -e
+          set -x
+          cd $FCI_BUILD_DIR/src-capacitor/ios/App
+          agvtool new-version -all $(($BUILD_NUMBER +1))
+      - name: Set up code signing settings on Xcode project
+        script: |
+          xcode-project use-profiles
+      - name: Build ipa for distribution
+        script: |
+          xcode-project build-ipa --workspace "$XCODE_WORKSPACE" --scheme "$XCODE_SCHEME"
+      - name: Rename the artifact
+        script: |
+          mv build/ios/ipa/*.ipa build/ios/ipa/trufaves-app-ios-dev-$BUILD_NUMBER.ipa
+    artifacts:
+      - build/ios/ipa/*.ipa
+    publishing:
+      app_store_connect:
+        api_key: $APP_STORE_CONNECT_PRIVATE_KEY
+        key_id: $APP_STORE_CONNECT_KEY_IDENTIFIER
+        issuer_id: $APP_STORE_CONNECT_ISSUER_ID
+        submit_to_testflight: true
+      email:
+        recipients:
+          - sajid.qureshi@project10k.com
+        notify:
+          success: true
+          failure: true
+      slack:
+        channel: '#p-trufaves'
+        notify:
+          failure: true
+
+  build-ios-ipa-dev-2:
+    name: build ios ipa for dev environment
+    max_build_duration: 120
+    instance_type: mac_pro
+    environment:
+      groups:
+        - ios-trufaves-app
+        - android-trufaves-app
+      vars:
+        # Ionic Xcode worskspace and scheme
+        XCODE_WORKSPACE: 'src-capacitor/ios/App/App.xcworkspace'
+        XCODE_SCHEME: 'App'
+        APP_ENV: dev
+      node: 16.14.2
+      xcode: latest
+      cocoapods: default
+    scripts:
+      - *setup_sops_and_svc_acct_pre_prod
+      - *setup_env_var_pre_prod
+      - *install_node_modules
+      - name: Build and Copy web assets to ios project
+        script: |
+          quasar build -m capacitor -T ios --skip-pkg
+          cd src-capacitor && npx cap sync ios
+      - name: Cocoapods installation
+        script: |
+          cd $FCI_BUILD_DIR/src-capacitor/ios/App && pod install
+      - name: Set up keychain to be used for codesigning
+        script: |
+          keychain initialize
+      - name: Fetch signing files
+        script: |
+          app-store-connect fetch-signing-files com.trufaves.mobile --type IOS_APP_ADHOC --create
+      - name: Add certificates to keychain
+        script: |
+          keychain add-certificates
+      - name: Increment build number
+        script: |
+          #!/bin/sh
+          set -e
+          set -x
+          cd $FCI_BUILD_DIR/src-capacitor/ios/App
+          agvtool new-version -all $(($BUILD_NUMBER +1))
+      - name: Set up code signing settings on Xcode project
+        script: |
+          xcode-project use-profiles
+      - name: Build ipa for distribution
+        script: |
+          xcode-project build-ipa --workspace "$XCODE_WORKSPACE" --scheme "$XCODE_SCHEME"
+      - name: Rename the artifact
+        script: |
+          mv build/ios/ipa/*.ipa build/ios/ipa/trufaves-app-ios-dev-$BUILD_NUMBER.ipa
+    artifacts:
+      - build/ios/ipa/*.ipa
+    publishing:
+      email:
+        recipients:
+          - sajid.qureshi@cilalabs.com
+        notify:
+          success: true
+          failure: true
+      slack:
+        channel: '#p-trufaves'
+        notify:
+          success: true
+          failure: true
+
+  build-android-apk-prod:
+    name: build android apk for prod environment
+    max_build_duration: 120
+    instance_type: mac_pro
+    environment:
+      groups:
+        - prod-android-trufaves
+      vars:
+        KEYSTORE_PATH: /tmp/.keystore
+        APP_ENV: prod
+      node: 16.14.2
+    triggering:
+      events:
+        - tag
+      tag_patterns:
+        - pattern: 'android-prod-*'
+          include: true
+        - pattern: 'all-prod-*'
+          include: true
+      cancel_previous_builds: true
+    scripts:
+      - &setup_sops_and_svc_acct
+        name: setup sops and service account
+        script: |
+          brew install sops
+          echo $SERVICE_ACCOUNT_PROD > /tmp/svc-acct.json
+      - name: Setup google-service json for prod
+        script: |
+          cp $FCI_BUILD_DIR/docker/android/google-services.json $FCI_BUILD_DIR/src-capacitor/android/app/google-services.json
+      - &setup_env_vars_prod
+        name: Setup environment variables
+        script: |
+          export GOOGLE_APPLICATION_CREDENTIALS=/tmp/svc-acct.json
+          sops -d $FCI_BUILD_DIR/docker/env.production > $FCI_BUILD_DIR/.env
+      - *install_node_modules
+      - name: Build and Copy web assets to native project
+        script: |
+          quasar build -m capacitor -T android --skip-pkg
+          cd src-capacitor && npx cap sync android
+      - name: Set Android SDK location
+        script: |
+          echo "sdk.dir=$ANDROID_SDK_ROOT" > "$FCI_BUILD_DIR/src-capacitor/android/local.properties"
+      - name: Set up debug key.properties
+        script: |
+          rm -rf ~/.android/debug.keystore
+          keytool -genkeypair \
+            -alias androiddebugkey \
+            -keypass android \
+            -keystore ~/.android/debug.keystore \
+            -storepass android \
+            -dname 'CN=Android Debug,O=Android,C=US' \
+            -keyalg 'RSA' \
+            -keysize 2048 \
+            -validity 10000
+      - name: Setup keystore
+        script: |
+          echo $KEYSTORE | base64 --decode > $KEYSTORE_PATH
+          cat > $FCI_BUILD_DIR/src-capacitor/android/key.properties <<EOF
+          storePassword=$KEYSTORE_PASSWORD
+          keyPassword=$KEY_PASSWORD
+          keyAlias=$KEY_ALIAS
+          storeFile=$KEYSTORE_PATH
+          EOF
+      - name: Build Android apk and bundle
+        script: |
+          cd $FCI_BUILD_DIR/src-capacitor/android
+          export GIT_TAG_VERSION=`echo $FCI_TAG | cut -f3 -d'-'`
+          cp ../build.gradle app/build.gradle
+          chmod +x gradlew
+          ./gradlew bundleRelease
+          ./gradlew assembleRelease
+    artifacts:
+      - $FCI_BUILD_DIR/src-capacitor/android/app/build/**/outputs/**/*.aab
+      - $FCI_BUILD_DIR/src-capacitor/android/app/build/outputs/**/*.apk
+    publishing:
+      # google_play:
+      #   credentials: $GCLOUD_SERVICE_ACCOUNT_CREDENTIALS
+      #   track: internal
+      email:
+        recipients:
+          - sajid.qureshi@cilalabs.com
+        notify:
+          success: true
+          failure: true
+      slack:
+        channel: '#p-trufaves'
+        notify:
+          success: true
+          failure: true
+
+  build-ios-ipa-prod:
+    name: build ios ipa for prod environment
+    max_build_duration: 120
+    instance_type: mac_pro
+    environment:
+      groups:
+        - ios-trufaves-app
+        - prod-android-trufaves
+      vars:
+        # Ionic Xcode worskspace and scheme
+        XCODE_WORKSPACE: 'src-capacitor/ios/App/App.xcworkspace'
+        XCODE_SCHEME: 'App'
+        APP_ENV: prod
+      node: 16.14.2
+      xcode: latest
+      cocoapods: default
+    triggering:
+      events:
+        - tag
+      cancel_previous_builds: true
+      tag_patterns:
+        - pattern: 'ios-prod-*'
+          include: true
+        - pattern: 'all-prod-*'
+          include: true
+    scripts:
+      - *setup_sops_and_svc_acct
+      - *setup_env_vars_prod
+      - *install_node_modules
+      - name: Setup Google service json and info plist for Push Notification
+        script: |
+          cp $FCI_BUILD_DIR/docker/ios/GoogleService-Info.plist $FCI_BUILD_DIR/src-capacitor/ios/App/App/GoogleService-Info.plist
+          cp $FCI_BUILD_DIR/docker/ios/Info.plist $FCI_BUILD_DIR/src-capacitor/ios/App/App/Info.plist
+      - name: Build and Copy web assets to ios project
+        script: |
+          quasar build -m capacitor -T ios --skip-pkg
+          cd src-capacitor && npx cap sync ios
+      - name: Cocoapods installation
+        script: |
+          cd $FCI_BUILD_DIR/src-capacitor/ios/App && pod install
+      - name: Set up keychain to be used for codesigning
+        script: |
+          keychain initialize
+      - name: Fetch signing files
+        script: |
+          app-store-connect fetch-signing-files com.trufaves.mobile --type IOS_APP_STORE --create
+      - name: Add certificates to keychain
+        script: |
+          keychain add-certificates
+      - name: Increment build number
+        script: |
+          #!/bin/sh
+          set -e
+          set -x
+          export GIT_TAG_VERSION=`echo $FCI_TAG | cut -f3 -d'-'`
+          cd $FCI_BUILD_DIR/src-capacitor/ios/App
+          agvtool new-version -all $BUILD_NUMBER
+          agvtool new-marketing-version $GIT_TAG_VERSION
+      - name: Set up code signing settings on Xcode project
+        script: |
+          xcode-project use-profiles
+      - name: Build ipa for distribution
+        script: |
+          xcode-project build-ipa --workspace "$XCODE_WORKSPACE" --scheme "$XCODE_SCHEME"
+      - name: Rename the artifact
+        script: |
+          export GIT_TAG_VERSION=`echo $FCI_TAG | cut -f3 -d'-'`
+          mv build/ios/ipa/*.ipa  build/ios/ipa/trufaves-ios-prod-$GIT_TAG_VERSION.ipa
+    artifacts:
+      - build/ios/ipa/*.ipa
+    publishing:
+      app_store_connect:
+        api_key: $APP_STORE_CONNECT_PRIVATE_KEY
+        key_id: $APP_STORE_CONNECT_KEY_IDENTIFIER
+        issuer_id: $APP_STORE_CONNECT_ISSUER_ID
+        submit_to_app_store: true
+      slack:
+        channel: '#p-trufaves'
+        notify:
+          success: true
+          failure: true

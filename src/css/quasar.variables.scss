@@ -1,0 +1,423 @@
+
+// scss modules
+@use 'sass:map';
+// use theme-config file
+@use './theme-config.scss' as config;
+
+// define variables to be used in components
+// theme colors
+$primary: #356899;
+$secondary: #b9eeff;
+$accent: #5bd3ff;
+
+$dark: #3c3345;
+
+$info: #6457ee;
+$positive: #039855;
+$warning: #dc6803;
+$negative: #d92d20;
+
+// light color variable
+$light: map.get(config.$theme-colors, 'light');
+
+// primary color variables
+$primary-colors-map: map.get(config.$theme-colors, 'primary');
+$primary: map.get($primary-colors-map, '600');
+$primary-25: map.get($primary-colors-map, '25');
+$primary-50: map.get($primary-colors-map, '50');
+$primary-100: map.get($primary-colors-map, '100');
+$primary-200: map.get($primary-colors-map, '200');
+$primary-300: map.get($primary-colors-map, '300');
+$primary-400: map.get($primary-colors-map, '400');
+$primary-500: map.get($primary-colors-map, '500');
+$primary-600: map.get($primary-colors-map, '600');
+$primary-700: map.get($primary-colors-map, '700');
+$primary-800: map.get($primary-colors-map, '800');
+$primary-900: map.get($primary-colors-map, '900');
+
+// grey color variables
+$grey-colors-map: map.get(config.$theme-colors, 'grey');
+$grey: map.get($grey-colors-map, '600');
+$grey-25: map.get($grey-colors-map, '25');
+$grey-50: map.get($grey-colors-map, '50');
+$grey-100: map.get($grey-colors-map, '100');
+$grey-200: map.get($grey-colors-map, '200');
+$grey-300: map.get($grey-colors-map, '300');
+$grey-400: map.get($grey-colors-map, '400');
+$grey-500: map.get($grey-colors-map, '500');
+$grey-600: map.get($grey-colors-map, '600');
+$grey-700: map.get($grey-colors-map, '700');
+$grey-800: map.get($grey-colors-map, '800');
+$grey-900: map.get($grey-colors-map, '900');
+
+// success color variants
+$success-colors-map: map.get(config.$theme-colors, 'success');
+$success: map.get($success-colors-map, '600');
+$success-25: map.get($success-colors-map, '25');
+$success-50: map.get($success-colors-map, '50');
+$success-100: map.get($success-colors-map, '100');
+$success-200: map.get($success-colors-map, '200');
+$success-300: map.get($success-colors-map, '300');
+$success-400: map.get($success-colors-map, '400');
+$success-500: map.get($success-colors-map, '500');
+$success-600: map.get($success-colors-map, '600');
+$success-700: map.get($success-colors-map, '700');
+$success-800: map.get($success-colors-map, '800');
+$success-900: map.get($success-colors-map, '900');
+
+// warning and variants
+$warning-colors-map: map.get(config.$theme-colors, 'warning');
+$warning: map.get($warning-colors-map, '600');
+$warning-25: map.get($warning-colors-map, '25');
+$warning-50: map.get($warning-colors-map, '50');
+$warning-100: map.get($warning-colors-map, '100');
+$warning-200: map.get($warning-colors-map, '200');
+$warning-300: map.get($warning-colors-map, '300');
+$warning-400: map.get($warning-colors-map, '400');
+$warning-500: map.get($warning-colors-map, '500');
+$warning-600: map.get($warning-colors-map, '600');
+$warning-700: map.get($warning-colors-map, '700');
+$warning-800: map.get($warning-colors-map, '800');
+$warning-900: map.get($warning-colors-map, '900');
+
+// error and variants
+$error-colors-map: map.get(config.$theme-colors, 'error');
+$error: map.get($error-colors-map, '600');
+$error-25: map.get($error-colors-map, '25');
+$error-50: map.get($error-colors-map, '50');
+$error-100: map.get($error-colors-map, '100');
+$error-200: map.get($error-colors-map, '200');
+$error-300: map.get($error-colors-map, '300');
+$error-400: map.get($error-colors-map, '400');
+$error-500: map.get($error-colors-map, '500');
+$error-600: map.get($error-colors-map, '600');
+$error-700: map.get($error-colors-map, '700');
+$error-800: map.get($error-colors-map, '800');
+$error-900: map.get($error-colors-map, '900');
+
+// spaces override - for margin, padding, gutter spaces
+$space-base: 16px !default;
+$space-x-base: $space-base !default;
+$space-y-base: $space-base !default;
+$space-none: (
+  x: 0,
+  y: 0
+) !default;
+$space-4xs: (
+  x: (
+    $space-x-base * 0.125
+  ),
+  y: (
+    $space-y-base * 0.125
+  )
+) !default;
+$space-3xs: (
+  x: (
+    $space-x-base * 0.25
+  ),
+  y: (
+    $space-y-base * 0.25
+  )
+) !default;
+$space-2xs: (
+  x: (
+    $space-x-base * 0.375
+  ),
+  y: (
+    $space-y-base * 0.375
+  )
+) !default;
+$space-xs: (
+  x: (
+    $space-x-base * 0.5
+  ),
+  y: (
+    $space-y-base * 0.5
+  )
+) !default;
+$space-sm: (
+  x: (
+    $space-x-base * 0.75
+  ),
+  y: (
+    $space-y-base * 0.75
+  )
+) !default;
+$space-md: (
+  x: $space-x-base,
+  y: $space-y-base
+) !default;
+$space-lg: (
+  x: (
+    $space-x-base * 1.25
+  ),
+  y: (
+    $space-y-base * 1.25
+  )
+) !default;
+$space-xl: (
+  x: (
+    $space-x-base * 1.5
+  ),
+  y: (
+    $space-y-base * 1.5
+  )
+) !default;
+$space-2xl: (
+  x: (
+    $space-x-base * 2
+  ),
+  y: (
+    $space-y-base * 2
+  )
+) !default;
+$space-3xl: (
+  x: (
+    $space-x-base * 2.5
+  ),
+  y: (
+    $space-y-base * 2.5
+  )
+) !default;
+$space-4xl: (
+  x: (
+    $space-x-base * 3
+  ),
+  y: (
+    $space-y-base * 3
+  )
+) !default;
+$space-5xl: (
+  x: (
+    $space-x-base * 4
+  ),
+  y: (
+    $space-y-base * 4
+  )
+) !default;
+$space-6xl: (
+  x: (
+    $space-x-base * 5
+  ),
+  y: (
+    $space-y-base * 5
+  )
+) !default;
+$space-7xl: (
+  x: (
+    $space-x-base * 6
+  ),
+  y: (
+    $space-y-base * 6
+  )
+) !default;
+$space-8xl: (
+  x: (
+    $space-x-base * 8
+  ),
+  y: (
+    $space-y-base * 8
+  )
+) !default;
+$space-9xl: (
+  x: (
+    $space-x-base * 10
+  ),
+  y: (
+    $space-y-base * 10
+  )
+) !default;
+$space-10xl: (
+  x: (
+    $space-x-base * 12
+  ),
+  y: (
+    $space-y-base * 12
+  )
+) !default;
+$space-11xl: (
+  x: (
+    $space-x-base * 14
+  ),
+  y: (
+    $space-y-base * 14
+  )
+) !default;
+$space-12xl: (
+  x: (
+    $space-x-base * 16
+  ),
+  y: (
+    $space-y-base * 16
+  )
+) !default;
+
+// space list
+$spaces: (
+  'none': $space-none,
+  '4xs': $space-4xs,
+  '3xs': $space-3xs,
+  '2xs': $space-2xs,
+  'xs': $space-xs,
+  'sm': $space-sm,
+  'md': $space-md,
+  'lg': $space-lg,
+  'xl': $space-xl,
+  '2xl': $space-2xl,
+  '3xl': $space-3xl,
+  '4xl': $space-4xl,
+  '5xl': $space-5xl,
+  '6xl': $space-6xl,
+  '7xl': $space-7xl,
+  '8xl': $space-8xl,
+  '9xl': $space-9xl,
+  '10xl': $space-10xl,
+  '11xl': $space-11xl,
+  '12xl': $space-12xl
+) !default;
+
+// gutter spaces overrides - only going till 5xl(64px) : gutters usually fall below this
+$flex-gutter-4xs: ($space-base * 0.125) !default;
+$flex-gutter-3xs: ($space-base * 0.25) !default;
+$flex-gutter-2xs: ($space-base * 0.375) !default;
+$flex-gutter-xs: ($space-base * 0.5) !default;
+$flex-gutter-sm: ($space-base * 0.75) !default;
+$flex-gutter-md: $space-base !default;
+$flex-gutter-lg: ($space-base * 1.25) !default;
+$flex-gutter-xl: ($space-base * 1.5) !default;
+$flex-gutter-2xl: ($space-base * 2) !default;
+$flex-gutter-3xl: ($space-base * 2.5) !default;
+$flex-gutter-4xl: ($space-base * 3) !default;
+$flex-gutter-5xl: ($space-base * 4) !default;
+
+// gutter list
+// using for rounded border generation as well
+$flex-gutter: (
+  'none': 0,
+  '4xs': $flex-gutter-4xs,
+  '3xs': $flex-gutter-3xs,
+  '2xs': $flex-gutter-2xs,
+  'xs': $flex-gutter-xs,
+  'sm': $flex-gutter-sm,
+  'md': $flex-gutter-md,
+  'lg': $flex-gutter-lg,
+  'xl': $flex-gutter-xl,
+  '2xl': $flex-gutter-2xl,
+  '3xl': $flex-gutter-3xl,
+  '4xl': $flex-gutter-4xl,
+  '5xl': $flex-gutter-5xl
+) !default;
+
+// generic border radius override
+$generic-border-radius: 8px !default;
+
+// button variables override
+$button-border-radius: 8px !default;
+$button-padding: 16px !default;
+$button-font-size: 1.125rem !default;
+$button-line-height: 1.75rem !default;
+$button-font-weight: 500 !default;
+
+// body font size override
+$body-font-size: 16px !default;
+$body-line-height: 1.25 !default;
+
+// text weights override
+$text-weights: (
+  thin: 100,
+  light: 300,
+  regular: 400,
+  medium: 500,
+  semibold: 600,
+  bold: 700,
+  bolder: 900
+) !default;
+
+// typography variables override
+$h1: (
+  size: 4.5rem,
+  // 72px
+  line-height: 5.625rem,
+  letter-spacing: -0.01562em,
+  weight: 400
+) !default;
+$h2: (
+  size: 3.75rem,
+  // 60px
+  line-height: 4.625rem,
+  letter-spacing: -0.00833em,
+  weight: 400
+) !default;
+$h3: (
+  size: 3rem,
+  // 48px
+  line-height: 3.75rem,
+  letter-spacing: normal,
+  weight: 400
+) !default;
+$h4: (
+  size: 2.25rem,
+  // 36px
+  line-height: 2.75rem,
+  letter-spacing: 0.00735em,
+  weight: 400
+) !default;
+$h5: (
+  size: 1.875rem,
+  // 30px
+  line-height: 2.375rem,
+  letter-spacing: normal,
+  weight: 400
+) !default;
+$h6: (
+  size: 1.5rem,
+  // 24px
+  line-height: 2rem,
+  letter-spacing: 0.0125em,
+  weight: 400
+) !default;
+$subtitle1: (
+  size: 1.25rem,
+  // 20px
+  line-height: 1.875rem,
+  letter-spacing: 0.00937em,
+  weight: 400
+) !default;
+$subtitle2: (
+  size: 1.125rem,
+  // 18px
+  line-height: 1.75rem,
+  letter-spacing: 0.00714em,
+  weight: 400
+) !default;
+$body1: (
+  size: 1rem,
+  // 16px
+  line-height: 1.5rem,
+  letter-spacing: 0.03125em,
+  weight: 400
+) !default;
+$body2: (
+  size: 0.875rem,
+  // 14px
+  line-height: 1.25rem,
+  letter-spacing: 0.01786em,
+  weight: 400
+) !default;
+$caption: (
+  size: 0.75rem,
+  // 12px
+  line-height: 1.125rem,
+  letter-spacing: 0.03333em,
+  weight: 400
+) !default;
+$overline: (
+  size: 0.75rem,
+  // 12px
+  line-height: 1.5rem,
+  letter-spacing: 0.16667em,
+  weight: 500
+) !default;
+
+// separator default color override
+$separator-color: $grey-300 !default;
